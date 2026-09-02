@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Domo embed — Safari ITP asset test</title>
+<style>
+  :root { --ink:#06283d; --mut:#5b7c93; --line:#d8e4ec; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+         color:var(--ink); background:#f4f8fb; }
+  .wrap { max-width: 1180px; margin:0 auto; padding: 22px 16px 48px; }
+  h1 { font-size:22px; margin:0 0 6px; }
+  p.lede { color:var(--mut); margin:0 0 20px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px 18px; margin-bottom:18px; }
+  h2 { font-size:16px; margin:0 0 10px; }
+  table { border-collapse:collapse; width:100%; font-size:14px; }
+  th,td { text-align:left; padding:7px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--mut); font-weight:600; }
+  code { font:13px ui-monospace,SFMono-Regular,Menlo,monospace; background:#eef4f8; padding:1px 5px; border-radius:4px; }
+  .ok { color:#1c7c54; font-weight:700; }
+  .bad { color:#b3261e; font-weight:700; }
+  .frame { width:100%; height:1000px; border:1px solid var(--line); border-radius:10px; background:#fff; }
+  ul { margin:8px 0 0 18px; padding:0; }
+  li { margin-bottom:5px; }
+  .foot { color:var(--mut); font-size:13px; margin-top:8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Domo public embed — Safari ITP asset test</h1>
+  <p class="lede">This page is served from <code>github.io</code>, a different site from <code>domo.com</code>, so the Domo embed below is a genuine third-party iframe. That is the condition that triggers Safari's Intelligent Tracking Prevention.</p>
+
+  <div class="card">
+    <h2>What you are looking at</h2>
+    <p>The embedded Domo page holds two custom-app cards. Both run byte-identical application code. The only difference is where the build writes its external CSS and JS.</p>
+    <table>
+      <tr><th>Card</th><th>Assets served from</th><th>Expected in Safari</th></tr>
+      <tr>
+        <td><strong>A — private assets</strong></td>
+        <td><code>/assets/index-*.js|css</code><br>cookie-gated, needs <code>ryuu_sid</code></td>
+        <td><span class="bad">403 — blank, unstyled</span></td>
+      </tr>
+      <tr>
+        <td><strong>B — public-assets fix</strong></td>
+        <td><code>/public-assets/index-*.js|css</code><br>served unauthenticated</td>
+        <td><span class="ok">200 — renders fully</span></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>How to read the result</h2>
+    <ul>
+      <li><strong>Card B renders</strong> (dark panel, three metric tiles, teal and blue stacked bars) and <strong>card A is blank or unstyled</strong> → the fix works, ITP confirmed as the cause.</li>
+      <li><strong>Both render</strong> → cross-site tracking prevention is switched off in this browser. On macOS: Safari → Settings → Privacy → <em>Prevent cross-site tracking</em>. On iOS: Settings → Apps → Safari → <em>Prevent Cross-Site Tracking</em>.</li>
+      <li><strong>Both blank</strong> → something else is in the way; check the network log for the <code>domoapps</code> requests.</li>
+    </ul>
+    <p class="foot">Chrome currently renders both, because it still sends third-party cookies. That is temporary. Firefox renders both because it partitions the cookie rather than blocking it.</p>
+  </div>
+
+  <div class="card">
+    <h2>Live embed</h2>
+    <iframe class="frame" src="https://embed.domo.com/embed/pages/2WyZv" title="Domo public page embed"></iframe>
+    <p class="foot">Source: <code>https://embed.domo.com/embed/pages/2WyZv</code> — Domo instance <code>domo-sales-apac</code>, dummy data only.</p>
+  </div>
+</div>
+</body>
+</html>
